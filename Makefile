@@ -9,12 +9,17 @@ else ifeq ($(UNAME_M), aarch64)
 else 
 	ARCH=$(UNAME_M)
 endif
+ARCH=arm64
 
 BUILD_META=-build$(shell date +%Y%m%d)
 ORG ?= rancher
 PKG ?= github.com/kubernetes/autoscaler
 SRC ?= github.com/kubernetes/autoscaler
-TAG ?= 1.8.20$(BUILD_META)
+TAG ?= ${GITHUB_ACTION_TAG}
+
+ifeq ($(TAG),)
+TAG := 1.8.20$(BUILD_META)
+endif
 
 ifeq (,$(filter %$(BUILD_META),$(TAG)))
 $(error TAG ${TAG} needs to end with build metadata: $(BUILD_META))
@@ -36,7 +41,7 @@ image-build:
 .PHONY: log
 log:
 	@echo "ARCH=$(ARCH)"
-	@echo "TAG=$(TAG)"
+	@echo "TAG=$(TAG:$(BUILD_META)=)"
 	@echo "ORG=$(ORG)"
 	@echo "PKG=$(PKG)"
 	@echo "SRC=$(SRC)"

@@ -8,8 +8,8 @@ FROM --platform=$BUILDPLATFORM ${GO_IMAGE} as base-builder
 # copy xx scripts to your build stage
 COPY --from=xx / /
 RUN set -x && \
-    apk --no-cache add file make git clang lld
-RUN xx-apk --no-cache add musl-dev gcc lld
+    apk --no-cache add file musl-dev make git clang lld libc-dev
+RUN xx-apk --no-cache add musl-dev gcc lld libc-dev
 ARG TARGETPLATFORM
 
 FROM --platform=$BUILDPLATFORM base-builder as addon-builder
@@ -22,7 +22,7 @@ WORKDIR $GOPATH/src/${PKG}/addon-resizer
 RUN git branch -a
 RUN git checkout addon-resizer-${TAG} -b ${TAG}
 RUN go mod download
-
+RUN ls -altr /usr/include/stdlib.h
 # cross-compilation setup
 ARG TARGETPLATFORM
 RUN xx-go --wrap && \
